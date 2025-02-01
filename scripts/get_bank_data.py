@@ -161,16 +161,13 @@ def main():
         number_of_institutions = get_number_of_institutions()
     except Exception as e:
         raise RuntimeError(f"Failed to retrieve the total number of institutions: {e}") from e
-    # data = get_bank_dim_data(number_of_institutions)
-    # df = pd.DataFrame(data)
-    # df.to_csv('bank_data.csv')
+    data = get_bank_dim_data(number_of_institutions)
+    df = pd.DataFrame(data)
+    df.to_csv('bank_data.csv')
     data = get_bank_fact_data(number_of_institutions)
     df = pd.DataFrame(data)
     df.to_csv('bank_fact_data.csv')
 
 
 if __name__ == '__main__':
-    # bank_dim_data = get_bank_dim_data()
-    # df = pd.DataFrame(bank_dim_data)
-    # print(df)
     main()
