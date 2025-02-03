@@ -105,3 +105,7 @@ final_bank AS (
 SELECT charter_id, latest_deposits, latest_ym, prev_ym, deposit_change_pct, type
 FROM final_bank;
 ```
+
+### 🛠️ **Production Deployment**  
+In production, this ETL runs via **Apache Airflow**, using the DAG defined in [dag/dag_financial_institutions_etl.py](dag/dag_financial_institutions_etl.py).  
+- **Schedule:** Runs on the day **after the end of each quarter**.
