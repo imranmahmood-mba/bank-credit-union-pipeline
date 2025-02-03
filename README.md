@@ -157,8 +157,8 @@ To use LLM run the following commands:
 To start frontend: uvicorn llm.backend:app --host 0.0.0.0 --port 8000 --reload
 To start backend: streamlit run llm.frontend.py
 Example on how it works below:
-![Starting Screen](docs/docs/starting_screen.png)
-![Results Screen](docs/docs/results_screen.png)
+![Starting Screen](docs/starting_screen.png)
+![Results Screen](docs/results_screen.png)
 
 
 ### 🛠️ **Production Deployment**  
