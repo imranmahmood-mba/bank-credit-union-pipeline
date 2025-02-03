@@ -6,8 +6,10 @@
 - [About](#about)
 - [How It Works](#how-it-works)
 - [Entity-Relationship Diagram (ERD)](#entity-relationship-diagram-erd)
+- [LLM Client](#llm)
 - [Production Deployment](#production-deployment)
 - [License](#license)
+
 
 ## 📌 About
 This ETL extracts financial institution data from disparate sources and loads it into a **BigQuery** table.
@@ -149,6 +151,15 @@ union all
 select charter_id, latest_deposits, latest_ym, prev_ym, deposit_change_pct, type
 from final_credit_unions;
 ```
+
+### **LLM**
+To use LLM run the following commands:
+To start frontend: uvicorn llm.backend:app --host 0.0.0.0 --port 8000 --reload
+To start backend: streamlit run llm.frontend.py
+Example on how it works below:
+![Starting Screen](docs/docs/starting_screen.png)
+![Results Screen](docs/docs/results_screen.png)
+
 
 ### 🛠️ **Production Deployment**  
 In production, this ETL runs via **Apache Airflow**, using the DAG defined in [dag/dag_financial_institutions_etl.py](dag/dag_financial_institutions_etl.py).  
