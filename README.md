@@ -56,7 +56,7 @@ FROM `alpha-rank-ai.financial_institutions.fact_credit_unions`
 WHERE assets BETWEEN 500000000 AND 1000000000
 AND year = 2024 AND month = 09;
 ```
-#### **How many banks and credit unions are active by asset tier?**
+#### **Which banks and credit unions experienced >5% decline in deposits last quarter?**
 ```sql
 WITH get_periods AS (
     SELECT 
@@ -89,21 +89,65 @@ previous AS (
     GROUP BY charter_id, year, month
 ),
 
-final_bank AS (
-    SELECT 
-        l.*, 
-        p.prev_ym, 
-        p.prev_deposits, 
-        ROUND(SAFE_DIVIDE((l.latest_deposits - p.prev_deposits), p.prev_deposits) * 100, 2) AS deposit_change_pct,
-        'bank' AS type
-    FROM latest l
-    LEFT JOIN previous p 
-    ON l.charter_id = p.charter_id
-    WHERE ROUND(SAFE_DIVIDE((l.latest_deposits - p.prev_deposits), p.prev_deposits) * 100, 2) <= -5
-)
+final_bank as (SELECT 
+    l.*, 
+    p.prev_ym, 
+    p.prev_deposits, 
+    ROUND(SAFE_DIVIDE((l.latest_deposits - p.prev_deposits), p.prev_deposits) * 100, 2) AS deposit_change_pct,
+    'bank' AS type
+FROM latest l
+LEFT JOIN previous p 
+ON l.charter_id = p.charter_id
+where ROUND(SAFE_DIVIDE((l.latest_deposits - p.prev_deposits), p.prev_deposits) * 100, 2) <= -5),
 
-SELECT charter_id, latest_deposits, latest_ym, prev_ym, deposit_change_pct, type
-FROM final_bank;
+get_periods_credit_unions AS (
+    SELECT 
+        MAX(year * 100 + month) AS latest_ym,
+        CASE 
+            WHEN MAX(month) = 3 THEN (MAX(year) - 1) * 100 + 12
+            ELSE MAX(year) * 100 + (MAX(month) - 3)
+        END AS previous_ym
+    FROM `alpha-rank-ai.financial_institutions.fact_credit_unions`
+    WHERE year = 2024
+),
+
+credit_unions_latest AS (
+    SELECT 
+        charter_id, 
+        SUM(deposits) AS latest_deposits, 
+        year * 100 + month AS latest_ym
+    FROM `alpha-rank-ai.financial_institutions.fact_credit_unions`
+    WHERE year * 100 + month = (SELECT latest_ym FROM get_periods)
+    GROUP BY charter_id, year, month
+),
+
+credit_unions_previous AS (
+    SELECT 
+        charter_id, 
+        SUM(deposits) AS prev_deposits, 
+        year * 100 + month AS prev_ym
+    FROM `alpha-rank-ai.financial_institutions.fact_credit_unions`
+    WHERE year * 100 + month = (SELECT previous_ym FROM get_periods)
+    GROUP BY charter_id, year, month
+),
+
+final_credit_unions as (SELECT 
+    l.*, 
+    p.prev_ym, 
+    p.prev_deposits, 
+    ROUND(SAFE_DIVIDE((l.latest_deposits - p.prev_deposits), p.prev_deposits) * 100, 2) AS deposit_change_pct,
+    'credit_union' AS type
+FROM credit_unions_latest l
+LEFT JOIN credit_unions_previous p 
+ON l.charter_id = p.charter_id
+where ROUND(SAFE_DIVIDE((l.latest_deposits - p.prev_deposits), p.prev_deposits) * 100, 2) <= -5)
+
+
+select charter_id, latest_deposits, latest_ym, prev_ym, deposit_change_pct, type
+from final_bank
+union all 
+select charter_id, latest_deposits, latest_ym, prev_ym, deposit_change_pct, type
+from final_credit_unions;
 ```
 
 ### 🛠️ **Production Deployment**  
