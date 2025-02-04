@@ -1,0 +1,25 @@
+# Use the official Python image (force x86_64 architecture)
+FROM --platform=linux/amd64 python:3.11-slim
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy and install dependencies first (so they are cached)
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy only the service account JSON (if it doesn't change often)
+COPY llm/backend/service-account.json /tmp/service-account.json
+
+# Set environment variable for credentials
+ENV GOOGLE_APPLICATION_CREDENTIALS="/tmp/service-account.json"
+
+# Copy application code **last** (so it doesn't break cache for dependencies)
+COPY llm/backend /app
+
+# Expose the correct port
+EXPOSE 8000
+
+# Start FastAPI with Uvicorn
+CMD ["uvicorn", "backend:app", "--host", "0.0.0.0", "--port", "8000"]

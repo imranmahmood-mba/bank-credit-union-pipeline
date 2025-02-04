@@ -114,12 +114,13 @@ def prepare_data(file_path, month='09', year='2024'):
 
 
 def main():
+    # month and year are used to determine what quarter to get data for
     month = '09'
     year = '2024'
-    CURRENT_TIMESTAMP = datetime.now().timestamp()
-    get_credit_union_data(month, year)
-    latest_file = get_latest_file('/Users/imranmahmood/Projects/alpha-rank-ai/downloads/', '*.xlsx')
-    df_dim_sheet, df_fact_sheet = prepare_data(latest_file)
+    CURRENT_TIMESTAMP = datetime.now().timestamp() # used to append to file
+    get_credit_union_data(month, year) # get the credit union data using selenium
+    latest_file = get_latest_file('/Users/imranmahmood/Projects/alpha-rank-ai/downloads/', '*.xlsx') # get the excel file to process
+    df_dim_sheet, df_fact_sheet = prepare_data(latest_file) # process data
     df_dim_sheet.to_csv(f'cu_dim_data_{CURRENT_TIMESTAMP}.csv', index=False)
     df_fact_sheet.to_csv(f'cu_fact_data_{CURRENT_TIMESTAMP}.csv', index=False)
 

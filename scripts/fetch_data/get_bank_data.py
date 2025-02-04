@@ -151,17 +151,16 @@ def get_bank_fact_data(number_of_institutions: int) -> list:
 
 
 def main():
-    print("Running main")
-    CURRENT_TIMESTAMP = datetime.now().timestamp()
-    number_of_institutions = get_number_of_institutions()
+    CURRENT_TIMESTAMP = datetime.now().timestamp() # Get timestamp to append to file
+    number_of_institutions = get_number_of_institutions() # Used to determine number of iterations
 
-    bank_dim_data = get_bank_dim_data(number_of_institutions)
+    bank_dim_data = get_bank_dim_data(number_of_institutions) # Get bank dim data
     bank_dim_df = pd.DataFrame(bank_dim_data)
-    bank_dim_df.to_csv(f'bank_dim_data_{CURRENT_TIMESTAMP}.csv')
+    bank_dim_df.to_csv(f'bank_dim_data_{CURRENT_TIMESTAMP}.csv') # Save data
 
-    bank_fact_data = get_bank_fact_data(number_of_institutions)
+    bank_fact_data = get_bank_fact_data(number_of_institutions) # Get bank fact data
     bank_fact_df = pd.DataFrame(bank_fact_data)
-    bank_fact_df.to_csv(f'bank_fact_data_{CURRENT_TIMESTAMP}.csv')
+    bank_fact_df.to_csv(f'bank_fact_data_{CURRENT_TIMESTAMP}.csv') # Save data
 
 
 if __name__ == '__main__':

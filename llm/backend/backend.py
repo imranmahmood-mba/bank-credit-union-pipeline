@@ -4,12 +4,15 @@ from langchain_experimental.sql import SQLDatabaseChain
 from langchain.sql_database import SQLDatabase
 from google.cloud import bigquery
 from pydantic import BaseModel
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+import os
+import json
 
 # Initialize FastAPI
 app = FastAPI()
-# Create Bigquery client
+
 client = bigquery.Client()
+
 
 # Initialize OpenAI LLM with explicit instructions
 llm = ChatOpenAI(model_name="gpt-4", temperature=0.0)  # Set temperature to 0 for deterministic responses
@@ -38,16 +41,15 @@ def format_results(bigquery_results):
 class QueryRequest(BaseModel):
     question: str
 
-
+# Add both route patterns so they both point to the same function.
+@app.post("/query", include_in_schema=False)
 @app.post("/query/")
 def generate_sql(request: QueryRequest):
-    """
-    Takes a natural language question, runs the query, and returns results.
-    """
     try:
-        # Generate and execute SQL query using LangChain
+        print(f"Received Request: {request}")
+        # Generate and execute SQL query using LangChain (your logic)
         raw_results = query_chain.run(request.question)
         return {"query": request.question, "results": raw_results}
     except Exception as e:
         print(f"Error executing query: {e}")
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))

@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # FastAPI backend URL
-API_URL = "http://localhost:8000/query/"
+API_URL = "https://backend-service-rq45z6fh3q-uc.a.run.app/query/"
 
 # Streamlit UI
 st.set_page_config(page_title="Bank Data Query Assistant", layout="wide")
@@ -15,7 +15,7 @@ user_input = st.text_input("Ask a question about bank data:", "")
 if user_input:
     with st.spinner("Processing..."):
         response = requests.post(API_URL, json={"question": user_input})
-        
+
         if response.status_code == 200:
             data = response.json()
             sql_query = data["query"]
