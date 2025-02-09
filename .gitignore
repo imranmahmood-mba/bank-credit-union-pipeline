@@ -171,4 +171,4 @@ cython_debug/
 .pypirc
 
 # Google
-/service-account.json
+llm/backend/service-account.json
